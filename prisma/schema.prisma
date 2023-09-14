@@ -1,0 +1,18 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model pages {
+  id          String   @id @unique @default(uuid())
+  page_name   String   //@db.VarChar(255)
+  org_key     String   //@db.VarChar(255)
+  description String?  //@db.VarChar(255)
+  is_active   Boolean? @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
