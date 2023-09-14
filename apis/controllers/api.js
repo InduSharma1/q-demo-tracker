@@ -60,27 +60,6 @@ async function updatePage(req, res) {
         return catchExceptions(res, e.message, 500, 'Update Page');
     }
 }
-/** upsert page detail */
-async function upsertPage(req, res) {
-    try {
-        const req_body = Array.isArray(req.body) ? req.body[0] : req.body;
-        console.log("API Controller -  upsertPage - request", req_body);
-
-        const result = await prisma.pages.upsert({
-            where: { id: req_body.data.id }, // Specify the unique identifier for the upsert
-            create: req_body.data, // Data to insert if it doesn't exist
-            update: req_body.data, // Data to update if it exists
-        });
-
-        console.log('API Controller - upsertPage - result ', result);
-        return res.json({
-            pageid: result.id,
-        });
-    } catch (e) {
-        console.log("error in upsertPage --- ", e);
-        return catchExceptions(res, e.message, 500, 'Upsert Page');
-    }
-}
 /** get org list */
 async function listOfOrgKey(req, res) {
     console.log('List of Org key ');

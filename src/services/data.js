@@ -19,11 +19,6 @@ class DataService {
   updatePageData = async (data) => {
     return await axios.post(`/api/updatePageDetails`, { data })
   }
-  /**Upsert page deatils*/
-  upsertPageData = async (data) => {
-    return await axios.post(`/api/pageDetails`, { data })
-  }
-
   /** send request to the mixpanel to track events */
   trackMixpanel = async (props) => {
     return await axios.post(`mixpanel/track`, { props });
