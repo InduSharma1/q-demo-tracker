@@ -98,7 +98,6 @@ async function listOfOrgKey(req, res) {
 }
 module.exports = {
     getPageDetailsByOrgKey,
-    upsertPage,
     createPage,
     updatePage,
     listOfOrgKey
