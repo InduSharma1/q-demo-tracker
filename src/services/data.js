@@ -3,7 +3,7 @@ import axios from './axios'
 class DataService {
   /** get page details based on Org key */
   getPageData = async (org_key) => {
-    return await axios.get(`/api/pageDetails/${org_key}`)
+    return await axios.get(`/api/pages/${org_key}`)
   }
 
   /**get the list of org keys */
@@ -13,15 +13,11 @@ class DataService {
 
   /**Create page deatils*/
   createPageData = async (data) => {
-    return await axios.post(`/api/createPageDetails`, { data })
+    return await axios.post(`/api/pages`, { data })
   }
   /**Update page deatils*/
   updatePageData = async (data) => {
-    return await axios.post(`/api/updatePageDetails`, { data })
-  }
-  /** send request to the mixpanel to track events */
-  trackMixpanel = async (props) => {
-    return await axios.post(`mixpanel/track`, { props });
+    return await axios.patch(`/api/pages`, { data })
   }
 }
 

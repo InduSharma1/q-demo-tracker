@@ -2,28 +2,30 @@ const axios = require("axios");
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const { catchExceptions } = require("../helper");
+const Mixpanel = require('../mixpanel');
 
 /** get page details based on OrgKey */
 async function getPageDetailsByOrgKey(req, res) {
     console.log('API Controller - getPageDetailsByOrgKey request- ', req.params.org_key);
     const org_key = req.params.org_key;
     try {
-        const pageDetails = await prisma.pages.findMany({
+        const pages = await prisma.pages.findMany({
             where: {
                 org_key: org_key,
             },
         });
 
-        console.log("API Controller - getPageDetailsByOrgKey - pagesDetails- ", pageDetails);
-        return res.json({ pagesDetails: pageDetails });
+        console.log("API Controller - getPageDetailsByOrgKey - pagesDetails- ", pages);
+        return res.json({ pages: pages });
     } catch (e) {
         console.log("error in getPageDetailsByOrgKey --- ", e);
-        return catchExceptions(res, e.message, 500, 'Get Pages');
+        return catchExceptions(req.session.email, res, e.message, 500, 'Get Pages');
     }
 }
 /** create page detail */
 async function createPage(req, res) {
     try {
+        console.log('createPage');
         const req_body = Array.isArray(req.body) ? req.body[0] : req.body;
         console.log("API Controller -  createPage - request", req_body);
 
@@ -31,13 +33,15 @@ async function createPage(req, res) {
             data: req_body.data
         });
 
+        await Mixpanel.track(req.session.email, { action: 'Added a new page' });
+
         console.log('API Controller - createPage - result ', result);
         return res.json({
-            pageid: result.id,
+            page_id: result.id,
         });
     } catch (e) {
         console.log("error in createPage --- ", e);
-        return catchExceptions(res, e.message, 500, 'Create Page');
+        return catchExceptions(req.session.email, res, e.message, 500, 'Create Page');
     }
 }
 /** update page detail */
@@ -53,11 +57,11 @@ async function updatePage(req, res) {
 
         console.log('API Controller - updatePage - result ', result);
         return res.json({
-            pageid: result.id,
+            page_id: result.id,
         });
     } catch (e) {
         console.log("error in updatePage --- ", e);
-        return catchExceptions(res, e.message, 500, 'Update Page');
+        return catchExceptions(req.session.email, res, e.message, 500, 'Update Page');
     }
 }
 /** get org list */
@@ -67,6 +71,7 @@ async function listOfOrgKey(req, res) {
     const access_token = process.env.JWT_TOKEN || "";
     try {
         console.log("Axios token ", access_token);
+        console.log('Org keys ', req.session);
         const response = await axios.get(url, {
             headers: {
                 "Content-Type": "application/json",
@@ -76,6 +81,7 @@ async function listOfOrgKey(req, res) {
         console.log("result ", response.status);
         const result = response;
         if (response.status == 200) {
+            Mixpanel.track(req.session.email, { action: 'Page Viewed' });
             return res.send(result.data);
         } else {
             console.log("**** Q-Keys Error ****");
@@ -93,7 +99,7 @@ async function listOfOrgKey(req, res) {
         }
     } catch (e) {
         console.log("error in listOfOrgKey --- ", e);
-        return catchExceptions(res, e.message, 500, 'Get Org Key Data');
+        return catchExceptions(req.session.email, res, e.message, 500, 'Get Org Key Data');
     }
 }
 module.exports = {

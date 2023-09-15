@@ -1,8 +1,8 @@
 import AxiosInstance from "./axios";
 
-const AuthService = {
+const authService = {
     checkAuth() {
-        return AxiosInstance.get('/auth/check-auth')
+        return AxiosInstance.get('/auth/checkauth')
             .then(response => response.data.isAuthenticated)
             .catch(() => false);
     },
@@ -12,4 +12,4 @@ const AuthService = {
     }
 };
 
-export default AuthService;
+export default authService;

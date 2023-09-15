@@ -6,7 +6,7 @@ const { authenticateTokenForGetAuth } = require('../middleware/passportValidatio
 router.post('/register', authenticateTokenForGetAuth, auth_controller.register);
 router.get('/handoff/:handoff_param', auth_controller.handoff);
 router.post("/canvas/", auth_controller.canvasAuthentication);
-router.get('/check-auth', auth_controller.checkForSession);
+router.get('/checkauth', auth_controller.checkForSession);
 
 
 module.exports = router;

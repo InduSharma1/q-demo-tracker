@@ -1,6 +1,6 @@
 <template>
     <!-- spinner -->
-    <spinner v-if="loading"></spinner>
+    <Spinner v-if="loading"></Spinner>
 
     <!-- toasters -->
     <toast ref="toastCmp" :timer="5000" />
@@ -80,7 +80,7 @@
                         </td>
                         <td data-label="Active" role="gridcell">
                             <div class="slds-truncate slds-grid slds-grid_align-end">
-                                <button v-if="editEnabled"
+                                <button v-if="edit_enabled"
                                     class="slds-button slds-button_icon-border-filled slds-button_icon-small"
                                     aria-haspopup="true" @click="edit(page)">
                                     <svg aria-hidden="true" class="slds-button__icon">
@@ -93,7 +93,7 @@
                     </tr>
                 </tbody>
             </table>
-            <div v-if="noData === true" class="slds-text-align_center slds-m-top_medium">Looks like there's no page at the
+            <div v-if="no_data === true" class="slds-text-align_center slds-m-top_medium">Looks like there's no page at the
                 moment.
             </div>
         </div>
@@ -104,7 +104,7 @@
         </footer>
     </article>
     <!-- Add New Page Modal -->
-    <modal v-if="open_Page_modal" @click-close="closePageModal" @click-save="addEditPage" :save_button_label=submit_type
+    <modal v-if="open_page_modal" @click-close="closePageModal" @click-save="addEditPage" :save_button_label=submit_type
         size="x-small">
         <template #header>
             <h1 class="slds-text-heading_medium slds-hyphenate heading">
@@ -126,12 +126,13 @@ import SLDSButton from "./SLDS/Button.vue";
 import Modal from "./SLDS/Modal.vue";
 import InputForm from "./InputForm.vue";
 import Toast from "./SLDS/Toast.vue";
+import Spinner from "./SLDS/Spinner.vue";
 // api services
-import DataService from './../services/data';
+import DataService from '../services/data';
 
 export default defineComponent({
 
-    name: "pageList",
+    name: "PageList",
 
     props: {
         org_default: {
@@ -144,6 +145,7 @@ export default defineComponent({
         Modal,
         InputForm,
         Toast,
+        Spinner
     },
 
     created() {
@@ -170,7 +172,7 @@ export default defineComponent({
             /**Selected Org key */
             org_key: '',
             /** open the add new user confirmation modal */
-            open_Page_modal: false,
+            open_page_modal: false,
             /** Page Name field */
             page_name_field: {},
             /** Page Description field */
@@ -182,9 +184,9 @@ export default defineComponent({
             /** List of pages */
             pages: [],
             /** If there is no page */
-            noData: true,
+            no_data: true,
             /** Enable flag for edit button */
-            editEnabled: true,
+            edit_enabled: true,
             /** Submit Button type - Add ,Edit */
             submit_type: 'Add',
         }
@@ -197,11 +199,11 @@ export default defineComponent({
                 this.org_key = data;
                 console.log('Org key for getting details ', this.org_key);
                 const result = await DataService.getPageData(data);
-                this.pages = result.data.pagesDetails;
+                this.pages = result.data.pages;
                 if (this.pages.length > 0) {
-                    this.noData = false;
+                    this.no_data = false;
                 } else {
-                    this.noData = true;
+                    this.no_data = true;
                 }
                 this.loading = false;
             } catch (error) {
@@ -209,7 +211,6 @@ export default defineComponent({
                 this.showToasts('error', error.response?.data?.error || 'Some error occured while fetching the data. Please try again!');
                 if (error.response.data.expired) return;
                 this.loading = false;
-                this.track('Client Error', error, 'fetch Pages');
             }
         },
 
@@ -245,7 +246,7 @@ export default defineComponent({
         /** open the Add Page modal */
         newPageModal() {
             this.submit_type = 'Add';
-            this.open_Page_modal = true;
+            this.open_page_modal = true;
             this.form_data = {
                 // id: crypto.randomUUID(),
                 page_name: '',
@@ -259,7 +260,7 @@ export default defineComponent({
         /** open the Edit Page modal */
         edit(page) {
             this.submit_type = 'Update';
-            this.open_Page_modal = true;
+            this.open_page_modal = true;
             this.form_data = page;
             this.page_name_field.value = this.form_data.page_name;
             this.page_description_field.value = this.form_data.description;
@@ -278,17 +279,15 @@ export default defineComponent({
                     return this.err_msg;
                 }
                 if (this.submit_type == 'Add') {
-                    //mixpanel tracking for adding new page
-                    DataService.trackMixpanel({ action: 'Add New Page' });
                     this.form_data.org_key = this.org_key;
                     this.form_data.is_active = true;
-                    this.open_Page_modal = false;
+                    this.open_page_modal = false;
                     //Sending data to DB
-                    const pageId = await this.PushingDataToServer(this.form_data);
+                    const page_id = await this.PushingDataToServer(this.form_data);
                     //this.fetchDataFromServer(this.org_key);
-                    this.form_data.id = pageId;
+                    this.form_data.id = page_id;
                     this.pages.push({
-                        id: pageId,
+                        id: page_id,
                         page_name: this.form_data.page_name,
                         description: this.form_data.description,
                         is_active: this.form_data.is_active,
@@ -297,22 +296,21 @@ export default defineComponent({
                 }
                 else {
                     //Update
-                    this.open_Page_modal = false;
+                    this.open_page_modal = false;
                     //Sending data to DB
                     this.PushingDataToServer(this.form_data);
                 }
                 console.log('last form data', this.pages);
-                this.noData = false;
+                this.no_data = false;
                 this.loading = false;
             } catch (error) {
                 console.log("error in add page ----", error);
                 this.loading = false;
-                this.track('Client Error', error, 'Add/Edit Button');
             }
         },
         /** close the reset modal */
         closePageModal() {
-            this.open_Page_modal = false;
+            this.open_page_modal = false;
             this.err_msg = '';
             this.form_data = {
                 // id: crypto.randomUUID(),
@@ -327,18 +325,19 @@ export default defineComponent({
         /** when the checkbox is clicked */
         togglePage(event) {
             this.submit_type = 'Update';
-            let selectedPage = this.pages.find(page => page.id === (event.target).value);
-            if (selectedPage) {
-                selectedPage.is_active = !selectedPage.is_active;
+            let selected_page = this.pages.find(page => page.id === (event.target).value);
+            if (selected_page) {
+                selected_page.is_active = !selected_page.is_active;
                 console.log('Toggle value ', JSON.stringify(this.pages));
                 //Update in DB
-                this.PushingDataToServer(selectedPage);
+                this.PushingDataToServer(selected_page);
             }
         },
         async PushingDataToServer(data) {
             try {
                 this.loading = true;
                 let result;
+                console.log('Create / Update data ', data);
                 if (this.submit_type == 'Add') {
                     result = await DataService.createPageData(data);
                 }
@@ -347,31 +346,13 @@ export default defineComponent({
                 }
                 console.log('result ', result);
                 this.loading = false;
-                return result.data.pageid;
+                return result.data.page_id;
             } catch (error) {
                 console.log("error in Pushing data to Org----", error);
                 this.showToasts('error', error.response?.data?.error || 'Some error occured while creating the data. Please try again!');
                 if (error.response.data.expired) return;
                 this.loading = false;
-                this.track('Client Error', error, 'Upsert Page');
             }
-        },
-        /**
-         * track the actions to mixpanel
-         * @param action action taken
-         * @param error error message, if any
-         * @param error_method method name which failed
-         */
-        track(action, error = '', error_method = '') {
-
-            const props = {
-                action
-            }
-            if (error) {
-                props.error = error;
-                props.error_method = error_method;
-            }
-            DataService.trackMixpanel(props);
         },
     },
 });

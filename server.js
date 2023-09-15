@@ -59,7 +59,6 @@ app.use(
 // routes
 app.use("/auth", require("./apis/routes/auth"));
 app.use("/api", require("./apis/routes/api"));
-app.use("/mixpanel", require("./apis/routes/mixpanel"));
 
 app.use(express.static(`${process.cwd()}/dist/`));
 

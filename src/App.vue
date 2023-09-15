@@ -10,7 +10,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import AuthService from "./services/authService";
+import authService from "./services/authService";
 import NoAccessError from "./components/NoAccessError.vue";
 
 export default defineComponent({
@@ -24,7 +24,7 @@ export default defineComponent({
     };
   },
   async created() {
-    this.is_authenticated = await AuthService.checkAuth();
+    this.is_authenticated = await authService.checkAuth();
 
     if (!this.is_authenticated) {
       console.log('Error in authenticating');

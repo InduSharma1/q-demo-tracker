@@ -18,7 +18,6 @@ import { defineComponent } from "vue";
 import PageHeader from "../components/PageHeader.vue";
 import PageFooter from "../components/PageFooter.vue";
 import PageBody from "../components/PageBody.vue";
-import DataService from './../services/data';
 
 export default defineComponent({
 
@@ -27,9 +26,6 @@ export default defineComponent({
     PageFooter,
     PageBody
   },
-  mounted() {
-    DataService.trackMixpanel({ action: 'Page View' });
-  }
 });
 </script>
 

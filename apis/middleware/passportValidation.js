@@ -9,8 +9,8 @@ async function authenticateTokenForGetAuth(req, res, next) {
         return catchExceptions(res, 'Token not sent', 401);
     }
 
-    const userInfo = await validateAuthToken(token);
-    const valid = userInfo.valid;
+    const user_info = await validateAuthToken(token);
+    const valid = user_info.valid;
 
     if (!valid) {
         return catchExceptions(res, 'Invalid Token', 401);

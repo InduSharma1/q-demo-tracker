@@ -1,18 +1,18 @@
 <template>
   <!-- spinner -->
-  <spinner v-if="loading"></spinner>
+  <Spinner v-if="loading"></Spinner>
 
   <!-- toasters -->
-  <toast ref="toastCmp" :timer="5000" />
+  <Toast ref="toastCmp" :timer="5000" />
 
   <!-- Picklist for Org goes here -->
   <div class="slds-form-element">
     <label class="slds-form-element__label" for="select-org_type">Select an Org Type:</label>
-    <SLDSPicklist :column="filter_org_list" :emit_direct="true" @on-change="selectedOrgChanged" :value="org_Selected">
+    <SLDSPicklist :column="filter_org_list" :emit_direct="true" @on-change="selectedOrgChanged" :value="org_selected">
     </SLDSPicklist>
     <dl id="org-id" class="slds-form-element__help slds-dl_inline">
       <dt class="slds-dl_inline__label slds-text-color_weak slds-truncate" title="Org ID">Org Type ID:</dt>
-      <dd class="slds-dl_inline__detail slds-text-font_monospace slds-truncate">{{ org_Selected.value }}</dd>
+      <dd class="slds-dl_inline__detail slds-text-font_monospace slds-truncate">{{ org_selected.value }}</dd>
     </dl>
   </div>
 </template>
@@ -21,23 +21,26 @@
 
 import { defineComponent } from "vue";
 import SLDSPicklist from "./SLDS/Picklist.vue";
+import Spinner from "./SLDS/Spinner.vue";
 import Toast from "./SLDS/Toast.vue";
 // api services
-import DataService from './../services/data';
+import DataService from '../services/data';
 
 export default defineComponent({
 
-  name: "orgTypeSelect",
+  name: "OrgTypeSelect",
 
   components: {
     Toast,
-    SLDSPicklist
+    SLDSPicklist,
+    Spinner
   },
   props: {
     org_default: {
       type: Object,
     }
   },
+  emits: ['onSelect'],
   data() {
     return {
       /** filter by picklist field */
@@ -47,12 +50,12 @@ export default defineComponent({
       /** to show the spinner when data is loaded */
       loading: false,
       /**Selected org  in the dropdown */
-      org_Selected: {},
+      org_selected: {},
     }
   },
   async created() {
     if (this.org_default) {
-      this.org_Selected = this.org_default;
+      this.org_selected = this.org_default;
     }
     this.fetchOrgKeyFromServer();
   },
@@ -113,9 +116,9 @@ export default defineComponent({
     /** called when the Org selected is changed */
     selectedOrgChanged(event) {
       const { name, value } = event;
-      this.org_Selected.label = name;
-      this.org_Selected.value = value;
-      this.$emit('on-select', {
+      this.org_selected.label = name;
+      this.org_selected.value = value;
+      this.$emit('onSelect', {
         name: name,
         value: value
       })

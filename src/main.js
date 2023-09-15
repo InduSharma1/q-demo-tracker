@@ -11,8 +11,8 @@ const app = createApp(App)
 app.use(store)
 app.use(router)
 
-const urlParams = new URLSearchParams(window.location.search);
-const email = urlParams.get("email");
+const url_params = new URLSearchParams(window.location.search);
+const email = url_params.get("email");
 app.use(VueGtag, {
     property: {
         id: "G-9M1JV4STMX",
