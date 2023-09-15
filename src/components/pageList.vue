@@ -17,7 +17,7 @@
                 <div class="slds-media__body slds-truncate">
                     <h2>
                         <a href="javascript:void(0);" class="slds-text-link_reset">
-                            <span class="slds-text-heading_small">Page List</span>
+                            <span class="slds-text-heading_small">Page List ({{ no_of_pages }})</span>
                         </a>
                     </h2>
 
@@ -189,6 +189,8 @@ export default defineComponent({
             edit_enabled: true,
             /** Submit Button type - Add ,Edit */
             submit_type: 'Add',
+            /**No of pages per Org */
+            no_of_pages: 0
         }
     },
     methods: {
@@ -202,6 +204,7 @@ export default defineComponent({
                 this.pages = result.data.pages;
                 if (this.pages.length > 0) {
                     this.no_data = false;
+                    this.no_of_pages = this.pages.length;
                 } else {
                     this.no_data = true;
                 }
@@ -293,6 +296,7 @@ export default defineComponent({
                         is_active: this.form_data.is_active,
                         org_key: this.form_data.org_key
                     });
+                    this.no_of_pages = this.no_of_pages + 1;
                 }
                 else {
                     //Update
