@@ -14,7 +14,6 @@
     "build": "vite build",
     "watch": "vite build --watch",
     "postinstall": "vite build",
-    "prestart": "node db/setup.js",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/",

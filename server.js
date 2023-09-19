@@ -26,7 +26,8 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(helmet({
-    contentSecurityPolicy: false
+    contentSecurityPolicy: false,
+    frameguard: false
 }));
 
 app.use(express.urlencoded({ limit: '100mb', extended: true }));

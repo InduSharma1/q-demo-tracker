@@ -1,38 +1,10 @@
 <template>
   <div class="slds-grid slds-grid_frame slds-wrap slds-grid_vertical slds-grid_vertical-stretch slds-p-around_medium">
-    <!-- access denied page -->
-    <no-access-error v-if="!is_authenticated"></no-access-error>
-    <template v-if="is_loading">
-      <router-view></router-view>
-    </template>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import { defineComponent } from "vue";
-import authService from "./services/authService";
-import NoAccessError from "./components/NoAccessError.vue";
-
-export default defineComponent({
-  components: {
-    NoAccessError,
-  },
-  data() {
-    return {
-      is_authenticated: false,
-      is_loading: true,
-    };
-  },
-  async created() {
-    this.is_authenticated = await authService.checkAuth();
-
-    if (!this.is_authenticated) {
-      console.log('Error in authenticating');
-      this.is_authenticated = true;
-      this.is_loading = false
-    }
-  },
-});
 </script>
 
 <style>
