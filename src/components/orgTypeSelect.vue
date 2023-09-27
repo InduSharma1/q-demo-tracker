@@ -53,7 +53,7 @@ export default defineComponent({
       org_selected: {},
     }
   },
-  async created() {
+  mounted() {
     if (this.org_default) {
       this.org_selected = this.org_default;
     }
@@ -78,7 +78,7 @@ export default defineComponent({
         this.makeColumns();
         this.loading = false;
       } catch (error) {
-        console.log("OrgTypeSelected - error in fetch Org----", error);
+        console.log("OrgTypeSelected - fetchOrgKeyFromServer - error in fetch Org -", error);
         this.showToasts('error', error.response?.data?.error || 'Some error occured while fetching the data. Please try again!');
         if (error.response.data.expired) return;
         this.loading = false;

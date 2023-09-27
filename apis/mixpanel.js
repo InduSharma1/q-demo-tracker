@@ -14,10 +14,8 @@ async function track(user_email, mixpanel_data) {
             action,
             ...data,
         });
-        console.log('mixpanel distinct_id ', distinct_id);
-        console.log('mixpanel action ', action);
     } catch (err) {
-        console.log('Mixpanel track error ', err.message);
+        console.log('Mixpanel - track - error ', err.message);
     }
 
 }

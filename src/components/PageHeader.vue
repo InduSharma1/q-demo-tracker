@@ -12,6 +12,13 @@
                 <p class="slds-page-header__title slds-truncate slds-align-middle" :title="app_name">{{ app_name }}</p>
                 <p class="slds-text-body_small slds-page-header__info">{{ app_description }}</p>
             </div>
+            <a title="Help" :href="tool_article_url" target="_blank" class="slds-text-title slds-m-right_x-small">
+                <span class="slds-icon_container slds-icon__svg--default">
+                    <svg class="slds-icon slds-icon_small slds-icon-text-default" aria-hidden="true">
+                        <use xlink:href="/icons/utility-sprite/svg/symbols.svg#help"></use>
+                    </svg>
+                </span>
+            </a>
         </div>
     </div>
 </template>
@@ -32,14 +39,15 @@ export default defineComponent({
             header_background_color: '',
             icon_path: '',
             show_popup: false,
+            tool_article_url: import.meta.env.VITE_APP_TOOL_ARTICLE_URL,
         }
     },
     created() {
         // this.app_name = 'Q Demo Tracker';
         // this.app_description = 'Help Demo Architects with data driven decisions';
         this.header_background_color = '#FFFFFF';
-        this.icon_background_style = 'slds-icon slds-icon-standard-default';
-        this.icon_path = `/icons/custom-sprite/svg/symbols.svg#custom25`;
+        this.icon_background_style = 'slds-icon slds-icon-text-default';
+        this.icon_path = `/icons/utility-sprite/svg/symbols.svg#tracker`;
     }
 });
 </script>

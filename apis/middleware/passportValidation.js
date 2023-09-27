@@ -2,8 +2,6 @@ const JWT = require('jsonwebtoken');
 const { catchExceptions } = require("../helper");
 
 async function authenticateTokenForGetAuth(req, res, next) {
-    console.log("headers", req.headers);
-    console.log("In Authenticate", req.headers.Authorization);
     const token = req.headers.authorization ? req.headers.authorization : null;
     if (!token) {
         return catchExceptions(res, 'Token not sent', 401);
@@ -30,7 +28,7 @@ async function validateAuthToken(token, secret = process.env.TOKEN_GENERATION_SE
             return { valid: false };
         }
     } catch (e) {
-        console.log("error in JWT", e);
+        console.log("PassportValidation middleware - validateAuthToken - error in JWT", e);
         return { valid: false }
     }
 }

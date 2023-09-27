@@ -17,14 +17,14 @@
                 <div class="slds-media__body slds-truncate">
                     <h2>
                         <a href="javascript:void(0);" class="slds-text-link_reset">
-                            <span class="slds-text-heading_small">Page List ({{ no_of_pages }})</span>
+                            <span class="slds-text-heading_small">Tracker ({{ no_of_pages }})</span>
                         </a>
                     </h2>
 
                 </div>
             </header>
             <div class="slds-no-flex">
-                <SLDSButton label="New Page" type="brand" :icon="false" @button-clicked="newPageModal"></SLDSButton>
+                <SLDSButton label="New Tracker" type="brand" @button-clicked="newPageModal"></SLDSButton>
             </div>
         </div>
         <div class="slds-card__body slds-scrollable">
@@ -39,13 +39,13 @@
                         <th scope="col" class="description_col">
                             <div class="slds-truncate" title="Description">Description</div>
                         </th>
-                        <th scope="col">
+                        <th scope="col" class="uniquecode_col">
                             <div class="slds-truncate" title="Unique code">Unique code</div>
                         </th>
                         <th scope="col" class="active_col">
                             <div class="slds-truncate" title="Is Active">Is Active ?</div>
                         </th>
-                        <th class="slds-cell-shrink" scope="col">
+                        <th class="edit_col slds-cell-shrink" scope="col">
                             <div class="slds-th__action">
                                 <span class="slds-assistive-text">Edit</span>
                             </div>
@@ -61,8 +61,10 @@
                         <td data-label="Description">
                             <div class="slds-text-body_small slds-text-color_weak">{{ page.description }}</div>
                         </td>
-                        <td data-label="Unique Code">
+                        <td data-label="Unique Code" class="unique-code-cell">
                             <div class="slds-truncate slds-text-font_monospace">{{ page.id }}</div>
+                            <SLDSButton v-if="page.is_active" class="copy-btn" type="brand" icon="copy" :button_icon="true"
+                                title="Copy Unique code" @button-clicked="copyUniquecode(page.id)" />
                         </td>
                         <td data-label="Is Active?" role="gridcell">
                             <div class="slds-truncate slds-grid slds-grid_align-end">
@@ -78,12 +80,11 @@
                                 </div>
                             </div>
                         </td>
-                        <td data-label="Active" role="gridcell">
+                        <td data-label="Edit" role="gridcell">
                             <div class="slds-truncate slds-grid slds-grid_align-end">
-                                <button v-if="edit_enabled"
-                                    class="slds-button slds-button_icon-border-filled slds-button_icon-small"
-                                    aria-haspopup="true" @click="edit(page)">
-                                    <svg aria-hidden="true" class="slds-button__icon">
+                                <button v-if="edit_enabled" class="slds-button slds-button_icon" aria-haspopup="true"
+                                    title="Edit" @click="edit(page)">
+                                    <svg aria-hidden="true" class="slds-button__icon slds-button__icon_medium">
                                         <use xlink:href="/icons/utility-sprite/svg/symbols.svg#edit"></use>
                                     </svg>
                                     <span class="slds-assistive-text">Edit</span>
@@ -93,13 +94,14 @@
                     </tr>
                 </tbody>
             </table>
-            <div v-if="no_data === true" class="slds-text-align_center slds-m-top_medium">Looks like there's no page at the
+            <div v-if="no_data === true" class="slds-text-align_center slds-m-top_medium">Looks like there's no tracker at
+                the
                 moment.
             </div>
         </div>
         <footer class="slds-card__footer">
-            <a class="slds-card__footer-action" href="javascript:void(0);" @click="newPageModal">Add a New Page
-                <span class="slds-assistive-text">New Page</span>
+            <a class="slds-card__footer-action" href="javascript:void(0);" @click="newPageModal">Add a New Tracker
+                <span class="slds-assistive-text">New Tracker</span>
             </a>
         </footer>
     </article>
@@ -108,7 +110,7 @@
         size="x-small">
         <template #header>
             <h1 class="slds-text-heading_medium slds-hyphenate heading">
-                {{ submit_type == 'Update' ? 'Update Page' : 'Add a New Page' }} </h1>
+                {{ submit_type == 'Update' ? 'Update Tracker' : 'Add a New Tracker' }} </h1>
         </template>
 
         <template #body>
@@ -148,8 +150,8 @@ export default defineComponent({
         Spinner
     },
 
-    created() {
-        if (this.org_default) {
+    mounted() {
+        if (this.org_default.value) {
             this.fetchDataFromServer(this.org_default.value);
         }
         this.makeColumns();
@@ -159,8 +161,10 @@ export default defineComponent({
         '$store.state.sharedData': {
             immediate: true,
             handler(newData) {
-                // Whenever the shared data changes, fetch data from the server
-                this.fetchDataFromServer(newData);
+                if (newData) {
+                    // Whenever the shared data changes, fetch data from the server
+                    this.fetchDataFromServer(newData);
+                }
             },
         },
     },
@@ -199,7 +203,6 @@ export default defineComponent({
             try {
                 this.loading = true;
                 this.org_key = data;
-                console.log('Org key for getting details ', this.org_key);
                 const result = await DataService.getPageData(data);
                 this.pages = result.data.pages;
                 if (this.pages.length > 0) {
@@ -207,10 +210,11 @@ export default defineComponent({
                     this.no_of_pages = this.pages.length;
                 } else {
                     this.no_data = true;
+                    this.no_of_pages = 0;
                 }
                 this.loading = false;
             } catch (error) {
-                console.log("PageList - fetchDataFromServer - error in fetch Org----", error);
+                console.log("Pagelist cmp - fetchDataFromServer - error in fetch page details -", error);
                 this.showToasts('error', error.response?.data?.error || 'Some error occured while fetching the data. Please try again!');
                 if (error.response.data.expired) return;
                 this.loading = false;
@@ -226,12 +230,11 @@ export default defineComponent({
 
         /** make columns for the page details */
         makeColumns() {
-            console.log('Pages inside pageList ', this.pages);
             this.page_name_field = {
                 name: 'page_name',
                 type: 'string',
                 label: 'Name',
-                placeholder: 'Name of the page that you want to track',
+                placeholder: 'Name of the tracker',
                 picklistValues: [],
                 required: true,
                 //helptext: 'Password length must be between 5 - 50 characters.'
@@ -240,7 +243,7 @@ export default defineComponent({
                 name: 'description',
                 type: 'string',
                 label: 'Description',
-                placeholder: 'This will help you identify the page. Stay concise. Be meaningful.',
+                placeholder: 'This will help you identify the tracker. Stay concise. Be meaningful.',
                 picklistValues: [],
                 required: false,
                 //helptext: 'Password length must be between 5 - 50 characters.'
@@ -271,7 +274,6 @@ export default defineComponent({
         /** called when an input field is changed inside the modal */
         inputChange(event) {
             this.form_data[event.name] = event.value;
-            console.log('form data', this.form_data);
         },
         /** add/ Edit a Page */
         async addEditPage() {
@@ -304,11 +306,10 @@ export default defineComponent({
                     //Sending data to DB
                     this.PushingDataToServer(this.form_data);
                 }
-                console.log('last form data', this.pages);
                 this.no_data = false;
                 this.loading = false;
             } catch (error) {
-                console.log("error in add page ----", error);
+                console.log("Pagelist cmp - fetchDataFromServer - error in add page -", error);
                 this.loading = false;
             }
         },
@@ -332,7 +333,6 @@ export default defineComponent({
             let selected_page = this.pages.find(page => page.id === (event.target).value);
             if (selected_page) {
                 selected_page.is_active = !selected_page.is_active;
-                console.log('Toggle value ', JSON.stringify(this.pages));
                 //Update in DB
                 this.PushingDataToServer(selected_page);
             }
@@ -341,22 +341,25 @@ export default defineComponent({
             try {
                 this.loading = true;
                 let result;
-                console.log('Create / Update data ', data);
                 if (this.submit_type == 'Add') {
                     result = await DataService.createPageData(data);
                 }
                 else {
                     result = await DataService.updatePageData(data);
                 }
-                console.log('result ', result);
                 this.loading = false;
                 return result.data.page_id;
             } catch (error) {
-                console.log("error in Pushing data to Org----", error);
+                console.log("Pagelist cmp - PushingDataToServer - error in Pushing data to Org -", error);
                 this.showToasts('error', error.response?.data?.error || 'Some error occured while creating the data. Please try again!');
                 if (error.response.data.expired) return;
                 this.loading = false;
             }
+        },
+        /** copy Unique code to clipboard */
+        copyUniquecode(text) {
+            navigator.clipboard.writeText(text);
+            this.showToasts('info', 'Unique code copied to the clipboard!');
         },
     },
 });
@@ -372,27 +375,33 @@ td {
     max-width: 100%;
 }
 
-.tool_table th.description_col {
-    width: 35%;
-}
-
-.tool_table td[data-label="Description"] div {
-    white-space: normal;
-}
-
 .tool_table th.name_col {
-    width: 16%;
+    width: 20%;
 }
 
-.tool_table th.version_col {
-    width: 4.7rem;
+.tool_table th.description_col {
+    width: 25%;
 }
 
-.tool_table th.type_col {
-    width: 4.7rem;
+.tool_table th.uniquecode_col {
+    width: 45%;
 }
 
 .tool_table th.active_col {
-    width: 5.8rem;
+    width: 6%;
+}
+
+.tool_table th.edit_col {
+    width: 4%;
+}
+
+.tool_table td[data-label="Edit"] div {
+    padding-right: 20px;
+}
+
+.unique-code-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 </style>

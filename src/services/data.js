@@ -19,6 +19,11 @@ class DataService {
   updatePageData = async (data) => {
     return await axios.patch(`/api/pages`, { data })
   }
+
+  login = () => {
+    return window.open('/auth/login', '_self', 'noopener');
+  }
+
 }
 
 export default new DataService()

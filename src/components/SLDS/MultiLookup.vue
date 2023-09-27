@@ -191,7 +191,7 @@ export default defineComponent({
                 this.search_opened = true;
 
             } catch (error) {
-                console.log("error in search ----", error);
+                console.log("MultiLookup cmp - search - error ", error);
                 this.loading = false;
                 this.search_opened = false;
                 this.no_results = true;

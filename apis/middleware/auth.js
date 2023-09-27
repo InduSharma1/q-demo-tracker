@@ -3,13 +3,12 @@ const forge = require("node-forge");
 const privateKeyPem = process.env.VITE_APP_DECRYPTION_KEY || "";
 
 async function isAuthenticated(req, res, next) {
-    if (!req.session.accessToken) {
+    if (!req.session.email) {
         return catchExceptions(res, 'Unauthorized', 401);
     }
     if (req.method === "POST" || req.method === 'PATCH') {
         // Get the encrypted data and key from the request body
         const { data, key } = req.body;
-        console.log('isAuthenticated data ', data);
 
         // Decrypt the AES key with the RSA private key
         const private_key = forge.pki.privateKeyFromPem(privateKeyPem);
@@ -23,17 +22,15 @@ async function isAuthenticated(req, res, next) {
         decipher.start({ iv: decrypted_key }); // We used the AES key as the IV in the interceptor
         decipher.update(forge.util.createBuffer(forge.util.decode64(data)));
         decipher.finish();
-        console.log('req.body ', decipher.output);
 
         // Replace the request body with the decrypted data
         req.body = JSON.parse(decipher.output.toString("utf8"));
-        console.log('req.body ', req.body);
     }
     next();
 };
 
 async function mixpanelTrack(req, res, next) {
-    if (!req.session.accessToken) {
+    if (!req.session.email) {
         return catchExceptions(res, 'Unauthorized', 401);
     }
     next();

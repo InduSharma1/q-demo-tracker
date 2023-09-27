@@ -1,6 +1,4 @@
 <template>
-  <!-- access denied page -->
-  <no-access-error v-if="!is_authenticated" />
   <template v-if="is_loading">
     <div>
       <!-- page header -->
@@ -20,33 +18,34 @@
 <script>
 import { defineComponent } from "vue";
 import authService from "../services/authService";
-import NoAccessError from "../components/NoAccessError.vue";
 import PageHeader from "../components/PageHeader.vue";
 import PageFooter from "../components/PageFooter.vue";
 import PageBody from "../components/PageBody.vue";
+import DataService from "../services/data";
 
 export default defineComponent({
 
   components: {
     PageHeader,
     PageFooter,
-    PageBody,
-    NoAccessError
+    PageBody
   },
 
   data() {
     return {
       is_authenticated: false,
-      is_loading: true,
+      is_loading: false,
     };
   },
-  async created() {
+  async mounted() {
     this.is_authenticated = await authService.checkAuth();
 
     if (!this.is_authenticated) {
-      console.log('Error in authenticating');
-      this.is_authenticated = true;
-      this.is_loading = false
+      console.log('Adminview cmp - Error in authenticating');
+      DataService.login();
+    }
+    else {
+      this.is_loading = true;
     }
   },
 });
